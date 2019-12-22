@@ -165,40 +165,54 @@ export default {
                 },
               ],
             },
-
-            //xxx
-            // {
-            //   path: '/products',
-            //   name: 'products',
+             //客户
+            //  {
+            //   path: '/customer',
+            //   name: 'customer',
             //   icon: 'dashboard',
-            //   component:'./products',
-            // },
-            // {
-            //   path: '/order',
-            //   icon: 'table',
-            //   name: 'order',
+            //   component:'./customer',
             //   routes: [
-            //     {
-            //       name: 'all',
-            //       icon: 'smile',
-            //       path: '/order/all',
-            //       component: './order/all',      
-            //     },
-            //     {
-                  
-            //       path: '/order/all/create',
-            //       component: './order/all/create', 
-            //     },
-            //     {
-            //       name: 'abandoned',
-            //       icon: 'smile',
-            //       path: '/order/abandoned',
-            //       component: './order/abandoned',
-            //     },
+            //     {name: 'add',
+            //     icon: 'smile',
+            //     path: '/customer/add',
+            //     component: './customer/add',  }
             //   ],
             // },
 
-            //XXX
+            //商品
+             {
+               path: '/products',
+               name: 'products',
+               icon: 'dashboard',
+               component:'./products',
+             },
+            //订单
+             {
+               path: '/order',
+               icon: 'table',
+               name: 'order',
+               routes: [
+                 {
+                   name: 'all',
+                   icon: 'smile',
+                   path: '/order/all',
+                   component: './order/all',      
+                 },
+                 {
+                  
+                   path: '/order/all/create',
+                   component: './order/all/create', 
+                 },
+                 {
+                   name: 'abandoned',
+                   icon: 'smile',
+                   path: '/order/abandoned',
+                   component: './order/abandoned',
+                 },
+               ],
+             },
+
+            
             {
               path: '/list',
               icon: 'table',
