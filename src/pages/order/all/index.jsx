@@ -24,8 +24,8 @@ import CreateForm from './components/CreateForm';
 import StandardTable from './components/StandardTable';
 import UpdateForm from './components/UpdateForm';
 import styles from './style.less';
-import  {routes}  from '../../.umi/router';  
-import Link from 'umi/link'
+import { routes } from '../../.umi/router';
+import Link from 'umi/link';
 import { log } from 'util';
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -52,25 +52,33 @@ class Order extends Component {
 
   columns = [
     {
-      title: 'Order',
+      title: '订单号',
       dataIndex: 'name',
-      render:(val)=>val
+      render: val => val,
     },
     {
-      title: 'Date',
+      title: '日期',
       dataIndex: 'processed_at',
-      sorter:true,
+      sorter: true,
       render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
     },
     {
-      title: 'Customer',
-       dataIndex: 'customer.first_name',
-        render: (val, record) => (val==undefined?"/ /":`${val} ${record.customer.last_name}`),
+      title: '顾客',
+      dataIndex: 'customer.first_name',
+      render: (val, record) => (val == undefined ? '/ /' : `${val} ${record.customer.last_name}`),
     },
     {
-      title: 'Payment',
+      title: '付款',
       dataIndex: 'financial_status',
-      render:val=>{return <Badge status={val=='paid'?"success":"warning"} text={val} className={styles.payment} />}
+      render: val => {
+        return (
+          <Badge
+            status={val == 'paid' ? 'success' : 'warning'}
+            text={val}
+            className={styles.payment}
+          />
+        );
+      },
       // filters: [
       //   {
       //     text: status[0],
@@ -95,15 +103,23 @@ class Order extends Component {
       // },
     },
     {
-      title: 'Fulfillment',
+      title: '发货',
       dataIndex: 'fulfillment_status',
-      render:val=>{return <Badge status={val==null?"error":"warning"} text={val ? val : 'UnSend'} className={styles.fulfillment} />}
+      render: val => {
+        return (
+          <Badge
+            status={val == null ? 'error' : 'warning'}
+            text={val ? val : 'UnSend'}
+            className={styles.fulfillment}
+          />
+        );
+      },
     },
     {
-      title: 'Total',
+      title: '总计',
       dataIndex: 'total_price',
-      render: (val, record) => currencyFormatter.format(val, {code: record.currency})
-    }
+      render: (val, record) => currencyFormatter.format(val, { code: record.currency }),
+    },
     // {
     //   title: '操作',
     //   render: (text, record) => (
@@ -117,48 +133,65 @@ class Order extends Component {
   ];
 
   componentDidMount() {
-    const { dispatch } = this.props; 
+    const { dispatch } = this.props;
     dispatch({
       type: 'order/fetch',
     });
   }
 
+  linkDetail = id => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'order/linkdetail',
+      payload: id,
+    });
+  };
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch,order:{link,current} } = this.props;
+    const {
+      dispatch,
+      order: { link, current },
+    } = this.props;
     const { formValues } = this.state;
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
       const newObj = { ...obj };
       newObj[key] = getValue(filtersArg[key]);
       return newObj;
     }, {});
-    console.log(pagination);
-    console.log(link);
-   
     const params = {
-       cur:pagination.current,
+      cur: pagination.current,
       ...formValues,
       ...filters,
     };
-    // if(pagination.current!=current){
-    //   if(link.length==1){
-    //     params.page_info=link[0]
-    //   }
-    //   else{
-    //     pagination.current>current?params.page_info=link[1]:params.page_info=link[0]
-    //   }
-      
-    // }
+    const pa = {};
+    console.log('xsaxas', pagination.current, current);
+
     if (sorter.field) {
-        if(sorter.order==undefined){
-          params.order=sorter.field;
-        }
-      else{params.order = `${sorter.field} ${sorter.order.length==6?sorter.order.substr(0,3):sorter.order.substr(0,4)}`;}
-    
+      if (sorter.order == undefined) {
+        params.order = sorter.field;
+      } else {
+        params.order = `${sorter.field} ${
+          sorter.order.length == 6 ? sorter.order.substr(0, 3) : sorter.order.substr(0, 4)
+        }`;
+      }
     }
-    dispatch({
-      type: 'order/fetch',
-      payload: params,
-    });
+
+    if (pagination.current != current) {
+      pa.cur = pagination.current;
+      if (link.length == 1) {
+        pa.page_info = link[0];
+      } else {
+        pagination.current > current ? (pa.page_info = link[1]) : (pa.page_info = link[0]);
+      }
+      dispatch({
+        type: 'order/changepage',
+        payload: pa,
+      });
+    } else {
+      dispatch({
+        type: 'order/fetch',
+        payload: params,
+      });
+    }
   };
 
   handleFormReset = () => {
@@ -167,9 +200,10 @@ class Order extends Component {
     this.setState({
       formValues: {},
     });
+
     dispatch({
       type: 'order/fetch',
-      payload: {},
+      payload: 1,
     });
   };
 
@@ -184,7 +218,7 @@ class Order extends Component {
     const { dispatch } = this.props;
     const { selectedRows } = this.state;
     console.log(selectedRows[0].id);
-    
+
     if (!selectedRows) return;
 
     switch (e.key) {
@@ -192,7 +226,7 @@ class Order extends Component {
         dispatch({
           type: 'order/remove',
           payload: {
-            id: selectedRows.map(row=>row.id)
+            id: selectedRows.map(row => row.id),
           },
           callback: () => {
             this.setState({
@@ -216,6 +250,8 @@ class Order extends Component {
   handleSearch = e => {
     e.preventDefault();
     const { dispatch, form } = this.props;
+    console.log(form);
+
     form.validateFields((err, fieldsValue) => {
       if (err) return;
       const values = {
@@ -273,7 +309,7 @@ class Order extends Component {
 
   renderSimpleForm() {
     const { form } = this.props;
-    const { getFieldDecorator } = form; 
+    const { getFieldDecorator } = form;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row
@@ -294,7 +330,7 @@ class Order extends Component {
                 <Select
                   placeholder="请选择"
                   style={{
-                    width: '100%',
+                    width: '200px',
                   }}
                 >
                   <Option value="pending">pending</Option>
@@ -303,7 +339,7 @@ class Order extends Component {
               )}
             </FormItem>
           </Col>
-        
+
           <Col md={8} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
@@ -317,146 +353,17 @@ class Order extends Component {
               >
                 重置
               </Button>
-              <a
+              {/* <a
                 style={{
                   marginLeft: 8,
                 }}
                 onClick={this.toggleForm}
               >
                 展开 <Icon type="down" />
-              </a>
+              </a> */}
             </span>
           </Col>
         </Row>
-      </Form>
-    );
-  }
-
-  renderAdvancedForm() {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row
-          gutter={{
-            md: 8,
-            lg: 24,
-            xl: 48,
-          }}
-        >
-          
-          <Col md={8} sm={24}>
-            <FormItem label="订单号">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-
-          <Col md={8} sm={24}>
-            <FormItem label="付款状态">
-              {getFieldDecorator('financial_status')(
-                <Select
-                  placeholder="请选择"
-                  style={{
-                    width: '100%',
-                  }}
-                >
-                  <Option value="pending">pending</Option>
-                  <Option value="paid">paid</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="顾客">
-              {getFieldDecorator('customer.first_name')(<Input placeholder="请输入顾客的姓" />)}
-            </FormItem>
-          </Col>
-
-          
-        </Row>
-        <Row
-          gutter={{
-            md: 8,
-            lg: 24,
-            xl: 48,
-          }}
-        >
-          <Col md={8} sm={24}>
-            <FormItem label="更新日期">
-              {getFieldDecorator('date')(
-                <DatePicker
-                  style={{
-                    width: '100%',
-                  }}
-                  placeholder="请输入更新日期"
-                />,
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status3')(
-                <Select
-                  placeholder="请选择"
-                  style={{
-                    width: '100%',
-                  }}
-                >
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status4')(
-                <Select
-                  placeholder="请选择"
-                  style={{
-                    width: '100%',
-                  }}
-                >
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-        </Row>
-        <div
-          style={{
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              float: 'right',
-              marginBottom: 24,
-            }}
-          >
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button
-              style={{
-                marginLeft: 8,
-              }}
-              onClick={this.handleFormReset}
-            >
-              重置
-            </Button>
-            <a
-              style={{
-                marginLeft: 8,
-              }}
-              onClick={this.toggleForm}
-            >
-              收起 <Icon type="up" />
-            </a>
-          </div>
-        </div>
       </Form>
     );
   }
@@ -468,11 +375,12 @@ class Order extends Component {
 
   render() {
     const {
-      order: { data,count },
+      order: { data, count },
       loading,
     } = this.props;
 
-    
+    console.log('data', data.list);
+
     const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
@@ -489,7 +397,7 @@ class Order extends Component {
       handleUpdate: this.handleUpdate,
     };
     return (
-      <PageHeaderWrapper >
+      <PageHeaderWrapper>
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
@@ -497,11 +405,10 @@ class Order extends Component {
               {/* <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                 新建
               </Button> */}
-              <Link to={
-                {pathname:'/order/all/create'}
-              }>
-               添加订单
-              </Link>
+              <Button type="primary">
+                <Link to={{ pathname: '/order/draft/create' }}>添加订单</Link>
+              </Button>
+
               {selectedRows.length > 0 && (
                 <span>
                   <Button>批量操作</Button>
@@ -520,6 +427,13 @@ class Order extends Component {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
+              onRow={(record, index) => {
+                return {
+                  onClick: () => {
+                    this.linkDetail(data.list[index].id);
+                  },
+                };
+              }}
               rowKey="id"
             />
           </div>

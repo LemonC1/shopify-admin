@@ -23,3 +23,6 @@ export async function updateRule(params) {
     data: { ...params, method: 'update' },
   });
 }
+export async function getDrafts() {
+  return await axios('https://mirror.viralbox.org/chenbj/admin/api/2019-10/draft_orders.json');
+}

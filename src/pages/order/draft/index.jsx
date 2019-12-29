@@ -37,11 +37,11 @@ const statusMap = ['default', 'processing', 'success', 'error'];
 const status = ['Authorized', 'Paid', '已上线', '异常'];
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ abandoned, loading }) => ({
-  abandoned,
-  loading: loading.models.abandoned,
+@connect(({ draft, loading }) => ({
+  draft,
+  loading: loading.models.draft,
 }))
-class Abandoned extends Component {
+class Draft extends Component {
   state = {
     modalVisible: false,
     updateModalVisible: false,
@@ -53,7 +53,7 @@ class Abandoned extends Component {
 
   columns = [
     {
-      title: '弃单',
+      title: '草稿',
       dataIndex: 'name',
       render: val => val,
     },
@@ -64,9 +64,19 @@ class Abandoned extends Component {
     },
     {
       title: '客户',
-      dataIndex: 'shipping_address.name',
+      dataIndex: 'customer.first_name',
+      render: (val, record) => (val == undefined ? '/ /' : `${val} ${record.customer.last_name}`),
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
       render: val => val,
     },
+    // {
+    //   title: 'Placed by',
+    //   dataIndex: 'shipping_address.name',
+    //   render: (val) => val,
+    // },
     // filters: [
     //   {
     //     text: status[0],
@@ -90,7 +100,7 @@ class Abandoned extends Component {
     //   return <Badge status={statusMap[val]} text={status[val]} />;
     // },
     {
-      title: '总计',
+      title: '总计 ',
       dataIndex: 'total_price',
       sorter: true,
       render: (val, record) => currencyFormatter.format(val, { code: record.currency }),
@@ -110,7 +120,7 @@ class Abandoned extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'abandoned/fetch',
+      type: 'draft/fetch',
     });
   }
 
@@ -445,7 +455,7 @@ class Abandoned extends Component {
 
   render() {
     const {
-      abandoned: { data },
+      draft: { data },
       loading,
     } = this.props;
     const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
@@ -507,4 +517,4 @@ class Abandoned extends Component {
   }
 }
 
-export default Form.create()(Abandoned);
+export default Form.create()(Draft);

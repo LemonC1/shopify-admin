@@ -137,7 +137,6 @@ export default {
                   path: '/dashboard/workplace',
                   component: './dashboard/workplace',
                 },
-
               ],
             },
             {
@@ -165,7 +164,7 @@ export default {
                 },
               ],
             },
-             //客户
+            //客户
             //  {
             //   path: '/customer',
             //   name: 'customer',
@@ -179,40 +178,76 @@ export default {
             //   ],
             // },
 
-            //商品
-             {
-               path: '/products',
-               name: 'products',
-               icon: 'dashboard',
-               component:'./products',
-             },
             //订单
-             {
-               path: '/order',
-               icon: 'table',
-               name: 'order',
-               routes: [
-                 {
-                   name: 'all',
-                   icon: 'smile',
-                   path: '/order/all',
-                   component: './order/all',      
-                 },
-                 {
-                  
-                   path: '/order/all/create',
-                   component: './order/all/create', 
-                 },
-                 {
-                   name: 'abandoned',
-                   icon: 'smile',
-                   path: '/order/abandoned',
-                   component: './order/abandoned',
-                 },
-               ],
-             },
+            {
+              path: '/order',
+              icon: 'table',
+              name: 'order',
+              routes: [
+                {
+                  name: 'all',
+                  icon: 'profile',
+                  path: '/order/all',
+                  component: './order/all',
+                },
+                {
+                  path: '/order/all/order_detail/:id',
+                  component: './order/all/order_detail',
+                },
+                {
+                  name: 'draft',
+                  icon: 'profile',
+                  path: '/order/draft',
+                  component: './order/draft',
+                },
+                {
+                  path: '/order/draft/create',
+                  component: './order/draft/create',
+                },
+                {
+                  name: 'abandoned',
+                  icon: 'profile',
+                  path: '/order/abandoned',
+                  component: './order/abandoned',
+                },
+              ],
+            },
+            //顾客
+            //  {
+            //   path: '/customer',
+            //   icon: 'user',
+            //   name: 'customer',
+            //   routes: [
+            //     {
+            //       name: 'all',
+            //       icon: 'usergroup-delete',
+            //       path: '/customer/all',
+            //       component: './customer/all',
+            //     },
+            //   ],
+            // },
 
-            
+            //  //商品
+            //  {
+            //   name: 'products',
+            //   icon: 'profile',
+            //   path: '/products',
+            //   routes: [
+            //     {
+            //       name: 'all-products',
+            //       icon: 'smile',
+            //       path: '/products/allProducts',
+            //       component: './products/allProducts',
+            //     },
+            //     // {
+            //     //   name: 'add-products',
+            //     //   path: '/products/allProduct/:id',
+            //     //   component: './products/addProduct',
+            //     // },
+
+            //   ],
+            // },
+
             {
               path: '/list',
               icon: 'table',
@@ -382,7 +417,6 @@ export default {
             {
               component: '404',
             },
-           
           ],
         },
       ],
@@ -435,8 +469,7 @@ export default {
     '/admin/api/2019-10/': {
       target: 'https://chenbj.myshopify.com/',
       changeOrigin: true,
-      
-    } 
+    },
   },
-  history: 'hash'
+  history: 'hash',
 };

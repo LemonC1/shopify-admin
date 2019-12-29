@@ -40,7 +40,7 @@
   - [ ] Inventory
 - [ ] Customers
   - [ ] All customers
-  - [ ] add customers
+  - [ ] add customer
 
 ### 每周进度
 

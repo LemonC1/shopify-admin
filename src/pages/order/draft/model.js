@@ -1,7 +1,7 @@
 import { addRule, queryRule, removeRule, updateRule } from './service';
-import { getCheckouts } from '@/services/api';
+import { getDrafts } from './service';
 const Model = {
-  namespace: 'abandoned',
+  namespace: 'draft',
   state: {
     data: {
       list: [],
@@ -10,11 +10,13 @@ const Model = {
   },
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(getCheckouts, payload);
+      const response = yield call(getDrafts, payload);
+      console.log('111111', response);
+
       yield put({
         type: 'save',
         payload: {
-          list: response.data.checkouts,
+          list: response.data.draft_orders,
           pagination: {},
         },
       });
