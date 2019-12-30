@@ -19,11 +19,13 @@ import React, { Component, Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
 import moment from 'moment';
-import currencyFormatter from 'currency-formatter';
 import CreateForm from './components/CreateForm';
 import StandardTable from './components/StandardTable';
 import UpdateForm from './components/UpdateForm';
 import styles from './style.less';
+import  {routes}  from '../../.umi/router';  
+import Link from 'umi/link'
+import { log } from 'util';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -34,14 +36,14 @@ const getValue = obj =>
     .join(',');
 
 const statusMap = ['default', 'processing', 'success', 'error'];
-const status = ['Authorized', 'Paid', '已上线', '异常'];
+const status = ['关闭', '运行中', '已上线', '异常'];
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ abandoned, loading }) => ({
-  abandoned,
-  loading: loading.models.abandoned,
+@connect(({ customer, loading }) => ({
+  customer,
+  loading: loading.models.customer,
 }))
-class Abandoned extends Component {
+class Customer extends Component {
   state = {
     modalVisible: false,
     updateModalVisible: false,
@@ -53,55 +55,88 @@ class Abandoned extends Component {
 
   columns = [
     {
-      title: '弃单',
-      dataIndex: 'name',
-      render: val => val,
+      title: '用户名',
+      dataIndex: 'first_name',
+      key: 'name',
+      render: (val, record) => (val==undefined?"/ /":`${val} ${record.last_name}`),
     },
     {
-      title: '日期',
-      dataIndex: 'created_at',
-      render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
+      title: '地址',
+      dataIndex: 'default_address',
+      render: (val, record) => (val==undefined?"/ /":`${record.default_address.province} ${record.default_address.country}`),
     },
     {
-      title: '客户',
-      dataIndex: 'shipping_address.name',
-      render: val => val,
+      title: '订单数',
+      dataIndex: 'orders_count',
+      render:(val)=>val + ' ' + '订单',
     },
-    // filters: [
-    //   {
-    //     text: status[0],
-    //     value: '0',
-    //   },
-    //   {
-    //     text: status[1],
-    //     value: '1',
-    //   },
-    //   {
-    //     text: status[2],
-    //     value: '2',
-    //   },
-    //   {
-    //     text: status[3],
-    //     value: '3',
-    //   },
-    // ],
+    {
+      title: '共消费',
+      dataIndex: 'total_spent',
+      render: (val) => '$' + val + ' ' + '花费',
+    },
 
-    // render(val) {
-    //   return <Badge status={statusMap[val]} text={status[val]} />;
+    // {
+    //   title: '服务调用次数',
+    //   dataIndex: 'callNo',
+    //   sorter: true,
+    //   align: 'right',
+    //   render: val => `${val} 万`,
+    //   // mark to display a total number
+    //   needTotal: true,
     // },
-    {
-      title: '总计',
-      dataIndex: 'total_price',
-      sorter: true,
-      render: (val, record) => currencyFormatter.format(val, { code: record.currency }),
-    },
-   
+
+
+    // {
+    //   title: '状态',
+    //   dataIndex: 'status',
+    //   filters: [
+    //     {
+    //       text: status[0],
+    //       value: '0',
+    //     },
+    //     {
+    //       text: status[1],
+    //       value: '1',
+    //     },
+    //     {
+    //       text: status[2],
+    //       value: '2',
+    //     },
+    //     {
+    //       text: status[3],
+    //       value: '3',
+    //     },
+    //   ],
+
+    //   render(val) {
+    //     return <Badge status={statusMap[val]} text={status[val]} />;
+    //   },
+    // },
+
+    // {
+    //   title: '上次调度时间',
+    //   dataIndex: 'updatedAt',
+    //   sorter: true,
+    //   render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
+    // },
+
+    // {
+    //   title: '操作',
+    //   render: (text, record) => (
+    //     <Fragment>
+    //       <a onClick={() => this.handleUpdateModalVisible(true, record)}>配置</a>
+    //       <Divider type="vertical" />
+    //       <a href="">订阅警报</a>
+    //     </Fragment>
+    //   ),
+    // },
   ];
 
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'abandoned/fetch',
+      type: 'customer/fetch',
     });
   }
 
@@ -121,11 +156,11 @@ class Abandoned extends Component {
     };
 
     if (sorter.field) {
-      params.sorter = `${sorter.field}_${sorter.abandoned}`;
+      params.sorter = `${sorter.field}_${sorter.order}`;
     }
 
     dispatch({
-      type: 'abandoned/fetch',
+      type: 'customer/fetch',
       payload: params,
     });
   };
@@ -137,7 +172,7 @@ class Abandoned extends Component {
       formValues: {},
     });
     dispatch({
-      type: 'abandoned/fetch',
+      type: 'customer/fetch',
       payload: {},
     });
   };
@@ -152,12 +187,14 @@ class Abandoned extends Component {
   handleMenuClick = e => {
     const { dispatch } = this.props;
     const { selectedRows } = this.state;
+    console.log(selectedRows);
+    
     if (!selectedRows) return;
 
     switch (e.key) {
       case 'remove':
         dispatch({
-          type: 'abandoned/remove',
+          type: 'customer/remove',
           payload: {
             key: selectedRows.map(row => row.key),
           },
@@ -193,7 +230,7 @@ class Abandoned extends Component {
         formValues: values,
       });
       dispatch({
-        type: 'abandoned/fetch',
+        type: 'customer/fetch',
         payload: values,
       });
     });
@@ -215,7 +252,7 @@ class Abandoned extends Component {
   handleAdd = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'abandoned/add',
+      type: 'customer/add',
       payload: {
         desc: fields.desc,
       },
@@ -227,7 +264,7 @@ class Abandoned extends Component {
   handleUpdate = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'listAndtableList/update',
+      type: 'customer/update',
       payload: {
         name: fields.name,
         desc: fields.desc,
@@ -283,14 +320,14 @@ class Abandoned extends Component {
               >
                 重置
               </Button>
-              {/* <a
+              <a
                 style={{
                   marginLeft: 8,
                 }}
                 onClick={this.toggleForm}
               >
                 展开 <Icon type="down" />
-              </a> */}
+              </a>
             </span>
           </Col>
         </Row>
@@ -436,7 +473,7 @@ class Abandoned extends Component {
 
   render() {
     const {
-      abandoned: { data },
+      customer: { data,count },
       loading,
     } = this.props;
     const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
@@ -460,9 +497,9 @@ class Abandoned extends Component {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              {/* <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                 新建
-              </Button> */}
+              </Button>
               {selectedRows.length > 0 && (
                 <span>
                   <Button>批量操作</Button>
@@ -481,7 +518,6 @@ class Abandoned extends Component {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-              rowKey="id"
             />
           </div>
         </Card>
@@ -498,4 +534,4 @@ class Abandoned extends Component {
   }
 }
 
-export default Form.create()(Abandoned);
+export default Form.create()(Customer);

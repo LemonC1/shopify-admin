@@ -51,8 +51,14 @@ export default {
   'menu.products': '商品页面',
   'menu.products.all-products': '所有商品',
   'menu.products.add-products': '添加商品',
+  'menu.products.classify': '商品系列',
   'menu.order': '订单',
-  'menu.order.all': '所有订单',
+  
+  'menu.order.create': '创建订单',
   'menu.order.draft': '草稿',
   'menu.order.abandoned': '弃单',
+  'menu.customer': '顾客',
+  'menu.customer.all': '所有顾客',
+  'menu.customer.add': '添加顾客',
+
 };

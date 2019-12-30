@@ -164,19 +164,7 @@ export default {
                 },
               ],
             },
-            //客户
-            //  {
-            //   path: '/customer',
-            //   name: 'customer',
-            //   icon: 'dashboard',
-            //   component:'./customer',
-            //   routes: [
-            //     {name: 'add',
-            //     icon: 'smile',
-            //     path: '/customer/add',
-            //     component: './customer/add',  }
-            //   ],
-            // },
+         
 
             //订单
             {
@@ -195,14 +183,16 @@ export default {
                   component: './order/all/order_detail',
                 },
                 {
+                  name: 'create',
+                  icon: 'profile',
+                  path: '/order/draft/create',
+                  component: './order/draft/create',
+                },
+                {
                   name: 'draft',
                   icon: 'profile',
                   path: '/order/draft',
                   component: './order/draft',
-                },
-                {
-                  path: '/order/draft/create',
-                  component: './order/draft/create',
                 },
                 {
                   name: 'abandoned',
@@ -212,41 +202,54 @@ export default {
                 },
               ],
             },
+
+            //商品
+            {
+              path: '/products',
+              icon: 'form',
+              name: 'products',
+              routes: [
+                // {
+                //   name: 'all',
+                //   icon: 'table',
+                //   path: '/products/all',
+                //   component: './products/all',
+                // },
+                {
+                  name: 'all-products',
+                  icon: 'table',
+                  path: '/products/all-products',
+                  component: './products/all-products',
+                },
+                {
+                  name: 'classify',
+                  icon: 'pie-chart',
+                  path: '/products/classify',
+                  component: './products/classify',
+                },
+              ],
+            },
             //顾客
-            //  {
-            //   path: '/customer',
-            //   icon: 'user',
-            //   name: 'customer',
-            //   routes: [
-            //     {
-            //       name: 'all',
-            //       icon: 'usergroup-delete',
-            //       path: '/customer/all',
-            //       component: './customer/all',
-            //     },
-            //   ],
-            // },
+            {
+              path: '/customer',
+              icon: 'user',
+              name: 'customer',
+              routes: [
+                {
+                  name: 'all',
+                  icon: 'usergroup-delete',
+                  path: '/customer/all',
+                  component: './customer/all',
+                },
+                {
+                  name: 'add',
+                  icon: 'user-add',
+                  path: '/customer/add',
+                  component: './customer/add',
+                },
+              ],
+            },
 
-            //  //商品
-            //  {
-            //   name: 'products',
-            //   icon: 'profile',
-            //   path: '/products',
-            //   routes: [
-            //     {
-            //       name: 'all-products',
-            //       icon: 'smile',
-            //       path: '/products/allProducts',
-            //       component: './products/allProducts',
-            //     },
-            //     // {
-            //     //   name: 'add-products',
-            //     //   path: '/products/allProduct/:id',
-            //     //   component: './products/addProduct',
-            //     // },
-
-            //   ],
-            // },
 
             {
               path: '/list',

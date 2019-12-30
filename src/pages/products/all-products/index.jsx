@@ -19,7 +19,6 @@ import React, { Component, Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
 import moment from 'moment';
-import currencyFormatter from 'currency-formatter';
 import CreateForm from './components/CreateForm';
 import StandardTable from './components/StandardTable';
 import UpdateForm from './components/UpdateForm';
@@ -34,14 +33,14 @@ const getValue = obj =>
     .join(',');
 
 const statusMap = ['default', 'processing', 'success', 'error'];
-const status = ['Authorized', 'Paid', '已上线', '异常'];
+const status = ['关闭', '运行中', '已上线', '异常'];
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ abandoned, loading }) => ({
-  abandoned,
-  loading: loading.models.abandoned,
+@connect(({ product, loading }) => ({
+  product,
+  loading: loading.models.product,
 }))
-class Abandoned extends Component {
+class Product extends Component {
   state = {
     modalVisible: false,
     updateModalVisible: false,
@@ -53,55 +52,101 @@ class Abandoned extends Component {
 
   columns = [
     {
-      title: '弃单',
-      dataIndex: 'name',
-      render: val => val,
+      title: '产品',
+      dataIndex: 'title',
+      render:(val)=>val,
     },
     {
-      title: '日期',
-      dataIndex: 'created_at',
-      render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
+      title: '库存',
+      dataIndex: 'variants[0].inventory_quantity',
+      key: 'inventory',
+      sorter: (a, b) => a.variants[0].inventory_quantity - b.variants[0].inventory_quantity,
+      render: (val, rec) => {
+        let sum = 0;
+        for (let j = 0; j < rec.variants.length; j++) {
+          sum += rec.variants[j].inventory_quantity;
+        }
+        return (sum + ' ' + rec.variants.length + '个多属性的库存');
+      },
     },
     {
-      title: '客户',
-      dataIndex: 'shipping_address.name',
-      render: val => val,
+      title: '价格',
+      dataIndex: 'variants[0].price',
+      key: 'price',
+      sorter: (a, b) => a.variants[0].price - b.variants[0].price,
+      render: (val, rec) => {
+        let sum = 0;
+        sum = `$${rec.variants[0].price}`;
+        return sum;
+      },
     },
-    // filters: [
-    //   {
-    //     text: status[0],
-    //     value: '0',
-    //   },
-    //   {
-    //     text: status[1],
-    //     value: '1',
-    //   },
-    //   {
-    //     text: status[2],
-    //     value: '2',
-    //   },
-    //   {
-    //     text: status[3],
-    //     value: '3',
-    //   },
-    // ],
-
-    // render(val) {
-    //   return <Badge status={statusMap[val]} text={status[val]} />;
+    {
+      title: '类型',
+      dataIndex: 'product_type',
+      render:(val)=>val,
+    },
+    {
+      title: '供应商',
+      dataIndex: 'vendor',
+      render:(val)=>val,
+    },
+    // {
+    //   title: '服务调用次数',
+    //   dataIndex: 'callNo',
+    //   sorter: true,
+    //   align: 'right',
+    //   render: val => `${val} 万`,
+    //   // mark to display a total number
+    //   needTotal: true,
     // },
-    {
-      title: '总计',
-      dataIndex: 'total_price',
-      sorter: true,
-      render: (val, record) => currencyFormatter.format(val, { code: record.currency }),
-    },
-   
+    // {
+    //   title: '状态',
+    //   dataIndex: 'status',
+    //   filters: [
+    //     {
+    //       text: status[0],
+    //       value: '0',
+    //     },
+    //     {
+    //       text: status[1],
+    //       value: '1',
+    //     },
+    //     {
+    //       text: status[2],
+    //       value: '2',
+    //     },
+    //     {
+    //       text: status[3],
+    //       value: '3',
+    //     },
+    //   ],
+
+    //   render(val) {
+    //     return <Badge status={statusMap[val]} text={status[val]} />;
+    //   },
+    // },
+    // {
+    //   title: '上次调度时间',
+    //   dataIndex: 'updatedAt',
+    //   sorter: true,
+    //   render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
+    // },
+    // {
+    //   title: '操作',
+    //   render: (text, record) => (
+    //     <Fragment>
+    //       <a onClick={() => this.handleUpdateModalVisible(true, record)}>配置</a>
+    //       <Divider type="vertical" />
+    //       <a href="">订阅警报</a>
+    //     </Fragment>
+    //   ),
+    // },
   ];
 
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'abandoned/fetch',
+      type: 'product/fetch',
     });
   }
 
@@ -121,11 +166,11 @@ class Abandoned extends Component {
     };
 
     if (sorter.field) {
-      params.sorter = `${sorter.field}_${sorter.abandoned}`;
+      params.sorter = `${sorter.field}_${sorter.order}`;
     }
 
     dispatch({
-      type: 'abandoned/fetch',
+      type: 'product/fetch',
       payload: params,
     });
   };
@@ -137,7 +182,7 @@ class Abandoned extends Component {
       formValues: {},
     });
     dispatch({
-      type: 'abandoned/fetch',
+      type: 'product/fetch',
       payload: {},
     });
   };
@@ -152,12 +197,14 @@ class Abandoned extends Component {
   handleMenuClick = e => {
     const { dispatch } = this.props;
     const { selectedRows } = this.state;
+    console.log(selectedRows);
+    
     if (!selectedRows) return;
 
     switch (e.key) {
       case 'remove':
         dispatch({
-          type: 'abandoned/remove',
+          type: 'product/remove',
           payload: {
             key: selectedRows.map(row => row.key),
           },
@@ -193,7 +240,7 @@ class Abandoned extends Component {
         formValues: values,
       });
       dispatch({
-        type: 'abandoned/fetch',
+        type: 'product/fetch',
         payload: values,
       });
     });
@@ -215,7 +262,7 @@ class Abandoned extends Component {
   handleAdd = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'abandoned/add',
+      type: 'product/add',
       payload: {
         desc: fields.desc,
       },
@@ -227,7 +274,7 @@ class Abandoned extends Component {
   handleUpdate = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'listAndtableList/update',
+      type: 'product/update',
       payload: {
         name: fields.name,
         desc: fields.desc,
@@ -349,7 +396,13 @@ class Abandoned extends Component {
             lg: 24,
             xl: 48,
           }}
-        >
+        ><ul>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
           <Col md={8} sm={24}>
             <FormItem label="更新日期">
               {getFieldDecorator('date')(
@@ -436,7 +489,7 @@ class Abandoned extends Component {
 
   render() {
     const {
-      abandoned: { data },
+      product: { data },
       loading,
     } = this.props;
     const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
@@ -460,9 +513,9 @@ class Abandoned extends Component {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              {/* <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                 新建
-              </Button> */}
+              </Button>
               {selectedRows.length > 0 && (
                 <span>
                   <Button>批量操作</Button>
@@ -481,7 +534,6 @@ class Abandoned extends Component {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-              rowKey="id"
             />
           </div>
         </Card>
@@ -498,4 +550,4 @@ class Abandoned extends Component {
   }
 }
 
-export default Form.create()(Abandoned);
+export default Form.create()(Product);

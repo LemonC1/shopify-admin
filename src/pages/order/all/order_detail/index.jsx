@@ -51,7 +51,7 @@ class Detail extends Component {
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>
                   {this.props.detail.list.customer.first_name}{' '}
-                  {this.props.detail.list.customer.last_name} create the order{' '}
+                  {this.props.detail.list.customer.last_name} 创建的订单{' '}
                 </span>
                 <span style={{ paddingRight: '8px' }}>
                   {moment(this.props.detail.list.created_at).format('YYYY-MM-DD HH:mm:ss')}
@@ -75,7 +75,7 @@ class Detail extends Component {
       },
     };
     confirm({
-      title: `Do you Want to mask it ${ful == 'fulfilled' ? 'Unfulfill' : 'fulfilled'} ?`,
+      title: `更改 ${ful == 'fulfilled' ? 'UnSend' : 'fulfilled'} ?`,
       onOk() {
         dispatch({
           type: 'detail/update',
@@ -115,7 +115,7 @@ class Detail extends Component {
               <TreeNode
                 title={
                   <div style={{ display: 'flex', justifyContent: 'space-between', width: '576px' }}>
-                    <span> xzy edited the note on this order </span>
+                    <span> 编辑订单备注</span>
                     <span style={{ marginLeft: '5px' }}>{that.getData()}</span>
                   </div>
                 }
@@ -164,7 +164,7 @@ class Detail extends Component {
 
   changeEmail = () => {
     const { getFieldDecorator } = this.props.form;
-    console.log('ssss', getFieldDecorator);
+    
 
     const {
       dispatch,
@@ -243,7 +243,7 @@ class Detail extends Component {
             />
             <Badge
               status={list.fulfillment_status == 'fulfilled' ? 'processing' : 'warning'}
-              text={list.fulfillment_status == 'fulfilled' ? 'fulfilled' : 'Unfulfill'}
+              text={list.fulfillment_status == 'fulfilled' ? 'fulfilled' : 'Unsend'}
               className={styles.fulfillment}
             />
           </div>
@@ -262,7 +262,7 @@ class Detail extends Component {
                     twoToneColor={list.fulfillment_status == null ? '#ccc' : '#52c41a'}
                   />
                   <span style={{ fontSize: '18px', color: 'black' }}>
-                    {list.fulfillment_status == null ? 'Unfulfill' : list.fulfillment_status}{' '}
+                    {list.fulfillment_status == null ? 'UnSend' : list.fulfillment_status}{' '}
                     {list.length !== 0 && `(${list.line_items[0].quantity})`}
                   </span>
                 </div>
@@ -305,7 +305,7 @@ class Detail extends Component {
                       list.fulfillment_status == null ? 'n' : list.fulfillment_status,
                     )}
                   >
-                    Mask as {list.fulfillment_status == null ? 'fulfilled' : 'Unfulfill'}{' '}
+                    更改{list.fulfillment_status == null ? 'fulfilled' : 'UnSend'}{' '}
                   </Button>
                 </div>
               </Card>
@@ -328,14 +328,14 @@ class Detail extends Component {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>
-                    Subtotal{' '}
-                    <span style={{ paddingLeft: '20px' }}>{list.line_items[0].quantity} item</span>
+                    小计{' '}
+                    <span style={{ paddingLeft: '20px' }}>{list.line_items[0].quantity} 件商品</span>
                   </span>
                   <span>${list.subtotal_price}</span>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', margin: '15px 0' }}>
-                  <span>Tax</span>
+                  <span>税率</span>
                   <span>$0.00</span>
                 </div>
 
@@ -347,7 +347,7 @@ class Detail extends Component {
                     marginBottom: '10px',
                   }}
                 >
-                  <span>Total</span>
+                  <span>总价</span>
                   <span>${list.subtotal_price}</span>
                 </div>
 
@@ -360,7 +360,7 @@ class Detail extends Component {
                     borderTop: '1px solid #ccc',
                   }}
                 >
-                  <span>Paid by customer</span>
+                  <span>客户付款</span>
                   <span>
                     {list.financial_status == 'paid' ? `$${list.subtotal_price}` : `$0.00`}
                   </span>
@@ -374,21 +374,17 @@ class Detail extends Component {
                   }}
                 >
                   <Button size="large" type="primary">
-                    Mask as {list.financial_status == 'paid' ? 'pending' : 'paid '}
+                    更改{list.financial_status == 'paid' ? 'pending' : 'paid '}
                   </Button>
                 </div>
               </Card>
             )}
 
-            {/* Timeline*/}
-            <h2 style={{ padding: '20px 0 0 50px' }}>Timeline</h2>
-
-            <Timeline style={{ padding: '20px 50px 0' }}>{this.state.show}</Timeline>
-          </div>
-          <div style={{ flex: 3 }}>
+              
             {/* Note */}
+            
             {list.length != 0 && (
-              <Card bordered={true} style={{ marginBottom: '20px' }}>
+              <Card bordered={true} style={{ marginBottom: '30px' ,margin:'20px'}}>
                 <div>
                   <div
                     style={{
@@ -399,9 +395,9 @@ class Detail extends Component {
                       marginBottom: '15px',
                     }}
                   >
-                    <span>Notes</span>
+                    <span>备注</span>
                     <Button type="link" onClick={this.changeNote.bind(this)}>
-                      Edit
+                      编辑
                     </Button>
                   </div>
 
@@ -415,7 +411,7 @@ class Detail extends Component {
             )}
             {/* Customer */}
             {list.length != 0 && (
-              <Card bordered={true}>
+              <Card bordered={true} style={{ marginBottom: '30px' ,margin:'20px'}}>
                 <div>
                   <div
                     style={{
@@ -426,7 +422,7 @@ class Detail extends Component {
                       marginBottom: '15px',
                     }}
                   >
-                    <span>Customer</span>
+                    <span>顾客</span>
                     <Icon type="user" style={{ color: 'skyblue', fontSize: '25px' }} />
                   </div>
 
@@ -448,14 +444,23 @@ class Detail extends Component {
                     >
                       <span>{list.customer.email ? list.customer.email : 'no email'}</span>
                       <Button type="link" onClick={this.changeEmail.bind(this)}>
-                        Edit
+                        编辑
                       </Button>
                     </div>
                   )}
                 </div>
               </Card>
             )}
+
+            
+
+
+            {/* Timeline*/}
+            <h2 style={{ padding: '20px 0 0 50px' }}>订单时间</h2>
+
+            <Timeline style={{ padding: '20px 50px 0' }}>{this.state.show}</Timeline>
           </div>
+          
         </div>
       </PageHeaderWrapper>
     );

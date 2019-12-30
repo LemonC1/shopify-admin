@@ -326,22 +326,22 @@ class CreateOrder extends Component {
                 <div
                   style={{ display: 'flex', borderBottom: '1px solid #eee', marginBottom: '10px' }}
                 >
-                  <FormItem label="Notes" style={{ width: '100px', flex: 3, marginRight: '50px' }}>
-                    <Input placeholder="add a note..." onBlur={this.changeNote} />
+                  <FormItem label="备注" style={{ width: '100px', flex: 3, marginRight: '50px' }}>
+                    <Input placeholder="添加备注......" onBlur={this.changeNote} />
                   </FormItem>
                   <Row style={{ flex: 2, padding: '30px' }}>
                     <Col style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Subtotal</span> <span>{`$${this.state.totalprice}`}</span>
+                      <span>小计</span> <span>{`$${this.state.totalprice}`}</span>
                     </Col>
                     <Col
                       style={{ display: 'flex', justifyContent: 'space-between', margin: '20px 0' }}
                     >
-                      <span>Taxes</span> <span>$0.00</span>
+                      <span>税金</span> <span>$0.00</span>
                     </Col>
                     <Col
                       style={{ display: 'flex', justifyContent: 'space-between', color: 'black' }}
                     >
-                      <span>Total</span> <span>{`$${this.state.totalprice}`}</span>
+                      <span>总价</span> <span>{`$${this.state.totalprice}`}</span>
                     </Col>
                   </Row>
                 </div>

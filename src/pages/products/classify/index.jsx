@@ -19,7 +19,6 @@ import React, { Component, Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
 import moment from 'moment';
-import currencyFormatter from 'currency-formatter';
 import CreateForm from './components/CreateForm';
 import StandardTable from './components/StandardTable';
 import UpdateForm from './components/UpdateForm';
@@ -34,14 +33,15 @@ const getValue = obj =>
     .join(',');
 
 const statusMap = ['default', 'processing', 'success', 'error'];
-const status = ['Authorized', 'Paid', '已上线', '异常'];
+const status = ['关闭', '运行中', '已上线', '异常'];
+const classRules = ['', '', '', ''];
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ abandoned, loading }) => ({
-  abandoned,
-  loading: loading.models.abandoned,
+@connect(({ classify, loading }) => ({
+  classify,
+  loading: loading.models.classify,
 }))
-class Abandoned extends Component {
+class classify extends Component {
   state = {
     modalVisible: false,
     updateModalVisible: false,
@@ -53,55 +53,96 @@ class Abandoned extends Component {
 
   columns = [
     {
-      title: '弃单',
-      dataIndex: 'name',
-      render: val => val,
+      title: '标题',
+      dataIndex: 'title',
     },
     {
-      title: '日期',
-      dataIndex: 'created_at',
-      render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
+      title: '产品规则',
+      dataIndex: 'id',
+      key: 'id',
+      render(val,record) {
+        if(record.rules[0].column == 'variant_price') {
+          const column = '产品价格';
+          if(record.rules[0].relation == 'greater_than') {
+            const relation = '高于';
+            let abc = '';
+            return abc = column + relation + '$' + record.rules[0].condition;
+          }
+          else if(record.rules[0].relation == 'less_than') {
+            const relation = '低于';
+            let abc = '';
+            return abc = column + relation + '$' + record.rules[0].condition;
+          }
+          else if(record.rules[0].relation == 'equals') {
+            const relation = '等于';
+            let abc = '';
+            return abc = column + relation + '$' + record.rules[0].condition;
+          }
+          else if(record.rules[0].relation == 'not_equals') {
+            const relation = '不等于';
+            let abc = '';
+            return abc = column + relation + '$' + record.rules[0].condition;
+          }
+        };
+      },
     },
-    {
-      title: '客户',
-      dataIndex: 'shipping_address.name',
-      render: val => val,
-    },
-    // filters: [
-    //   {
-    //     text: status[0],
-    //     value: '0',
-    //   },
-    //   {
-    //     text: status[1],
-    //     value: '1',
-    //   },
-    //   {
-    //     text: status[2],
-    //     value: '2',
-    //   },
-    //   {
-    //     text: status[3],
-    //     value: '3',
-    //   },
-    // ],
-
-    // render(val) {
-    //   return <Badge status={statusMap[val]} text={status[val]} />;
+    // {
+    //   title: '服务调用次数',
+    //   dataIndex: 'callNo',
+    //   sorter: true,
+    //   align: 'right',
+    //   render: val => `${val} 万`,
+    //   // mark to display a total number
+    //   needTotal: true,
     // },
-    {
-      title: '总计',
-      dataIndex: 'total_price',
-      sorter: true,
-      render: (val, record) => currencyFormatter.format(val, { code: record.currency }),
-    },
-   
+    // {
+    //   title: '状态',
+    //   dataIndex: 'status',
+    //   filters: [
+    //     {
+    //       text: status[0],
+    //       value: '0',
+    //     },
+    //     {
+    //       text: status[1],
+    //       value: '1',
+    //     },
+    //     {
+    //       text: status[2],
+    //       value: '2',
+    //     },
+    //     {
+    //       text: status[3],
+    //       value: '3',
+    //     },
+    //   ],
+
+    //   render(val) {
+    //     return <Badge status={statusMap[val]} text={status[val]} />;
+    //   },
+    // },
+    // {
+    //   title: '上次调度时间',
+    //   dataIndex: 'updatedAt',
+    //   sorter: true,
+    //   render: val => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
+    // },
+    // {
+    //   title: '操作',
+    //   render: (text, record) => (
+    //     <Fragment>
+    //       <a onClick={() => this.handleUpdateModalVisible(true, record)}>配置</a>
+    //       <Divider type="vertical" />
+    //       <a href="">订阅警报</a>
+    //     </Fragment>
+    //   ),
+    // },
   ];
 
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'abandoned/fetch',
+      type: 'classify/fetch',
     });
   }
 
@@ -121,11 +162,11 @@ class Abandoned extends Component {
     };
 
     if (sorter.field) {
-      params.sorter = `${sorter.field}_${sorter.abandoned}`;
+      params.sorter = `${sorter.field}_${sorter.order}`;
     }
 
     dispatch({
-      type: 'abandoned/fetch',
+      type: 'classify/fetch',
       payload: params,
     });
   };
@@ -137,7 +178,7 @@ class Abandoned extends Component {
       formValues: {},
     });
     dispatch({
-      type: 'abandoned/fetch',
+      type: 'classify/fetch',
       payload: {},
     });
   };
@@ -152,12 +193,14 @@ class Abandoned extends Component {
   handleMenuClick = e => {
     const { dispatch } = this.props;
     const { selectedRows } = this.state;
+    console.log(selectedRows);
+    
     if (!selectedRows) return;
 
     switch (e.key) {
       case 'remove':
         dispatch({
-          type: 'abandoned/remove',
+          type: 'classify/remove',
           payload: {
             key: selectedRows.map(row => row.key),
           },
@@ -193,7 +236,7 @@ class Abandoned extends Component {
         formValues: values,
       });
       dispatch({
-        type: 'abandoned/fetch',
+        type: 'classify/fetch',
         payload: values,
       });
     });
@@ -215,7 +258,7 @@ class Abandoned extends Component {
   handleAdd = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'abandoned/add',
+      type: 'classify/add',
       payload: {
         desc: fields.desc,
       },
@@ -227,7 +270,7 @@ class Abandoned extends Component {
   handleUpdate = fields => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'listAndtableList/update',
+      type: 'classify/update',
       payload: {
         name: fields.name,
         desc: fields.desc,
@@ -436,7 +479,7 @@ class Abandoned extends Component {
 
   render() {
     const {
-      abandoned: { data },
+      classify: { data },
       loading,
     } = this.props;
     const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
@@ -460,9 +503,9 @@ class Abandoned extends Component {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              {/* <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                 新建
-              </Button> */}
+              </Button>
               {selectedRows.length > 0 && (
                 <span>
                   <Button>批量操作</Button>
@@ -481,7 +524,6 @@ class Abandoned extends Component {
               columns={this.columns}
               onSelectRow={this.handleSelectRows}
               onChange={this.handleStandardTableChange}
-              rowKey="id"
             />
           </div>
         </Card>
@@ -498,4 +540,4 @@ class Abandoned extends Component {
   }
 }
 
-export default Form.create()(Abandoned);
+export default Form.create()(classify);
