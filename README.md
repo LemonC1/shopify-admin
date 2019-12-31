@@ -8,6 +8,8 @@
 
 这是一个基于[Ant Design Pro](https://pro.ant.design)开发的项目。
 ( [(原型地址)](https://4n2j0y.axshare.com )   password：123456
+[(测试地址)] https://github.com/LemonC1/shopify-admin/blob/develop/test/test.md
+
 
 
 ### 项目成员和职责
