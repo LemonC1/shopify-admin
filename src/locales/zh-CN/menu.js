@@ -53,7 +53,7 @@ export default {
   'menu.products.add-products': '添加商品',
   'menu.products.classify': '商品系列',
   'menu.order': '订单',
-  
+  'menu.order.all': '所有订单',
   'menu.order.create': '创建订单',
   'menu.order.draft': '草稿',
   'menu.order.abandoned': '弃单',

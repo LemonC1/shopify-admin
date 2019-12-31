@@ -17,6 +17,7 @@ import {
 } from 'antd';
 import React, { Component, Fragment } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import Link from 'umi/link';
 import { connect } from 'dva';
 import moment from 'moment';
 import CreateForm from './components/CreateForm';
@@ -35,6 +36,39 @@ const getValue = obj =>
 const statusMap = ['default', 'processing', 'success', 'error'];
 const status = ['关闭', '运行中', '已上线', '异常'];
 
+function BuildvendorArray(Arr) {
+  var temp = []; //一个新的临时数组
+  if (Arr instanceof Array) {
+    const list = Arr.map(item => {
+      return item.vendor;
+    });
+    var temp = []; //一个新的临时数组
+    for (var i = 0; i < list.length; i++) {
+      if (temp.indexOf(list[i]) == -1) {
+        temp.push(list[i]);
+      }
+    }
+    return temp;
+  }
+  return temp;
+}
+function BuildtypeArray(Arr) {
+  var temp = []; //一个新的临时数组
+  if (Arr instanceof Array) {
+    const list = Arr.map(item => {
+      return item.product_type;
+    });
+    var temp = []; //一个新的临时数组
+    for (var i = 0; i < list.length; i++) {
+      if (temp.indexOf(list[i]) == -1) {
+        temp.push(list[i]);
+      }
+    }
+    return temp;
+  }
+  return temp;
+}
+
 /* eslint react/no-multi-comp:0 */
 @connect(({ product, loading }) => ({
   product,
@@ -52,9 +86,20 @@ class Product extends Component {
 
   columns = [
     {
+      title: ' ',
+      dataIndex: 'image.src',
+      render: (_, record) => {
+        const srcs =
+          record.image == null
+            ? 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576564146465&di=0eea2d0226ac52395002f6aaf264008c&imgtype=0&src=http%3A%2F%2Fe.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fb90e7bec54e736d13303db2498504fc2d562698d.jpg'
+            : record.image.src;
+        return <img src={srcs} style={{ width: '50px' }} />;
+      },
+    },
+    {
       title: '产品',
       dataIndex: 'title',
-      render:(val)=>val,
+      render: val => <a>{val}</a>,
     },
     {
       title: '库存',
@@ -285,59 +330,118 @@ class Product extends Component {
     this.handleUpdateModalVisible();
   };
 
+  // renderSimpleForm() {
+  //   const { form } = this.props;
+  //   const { getFieldDecorator } = form;
+  //   return (
+  //     <Form onSubmit={this.handleSearch} layout="inline">
+  //       <Row
+  //         gutter={{
+  //           md: 8,
+  //           lg: 24,
+  //           xl: 48,
+  //         }}
+  //       >
+  //         <Col md={8} sm={24}>
+  //           <FormItem label="规则名称">
+  //             {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+  //           </FormItem>
+  //         </Col>
+  //         <Col md={8} sm={24}>
+  //           <FormItem label="使用状态">
+  //             {getFieldDecorator('status')(
+  //               <Select
+  //                 placeholder="请选择"
+  //                 style={{
+  //                   width: '100%',
+  //                 }}
+  //               >
+  //                 <Option value="0">关闭</Option>
+  //                 <Option value="1">运行中</Option>
+  //               </Select>,
+  //             )}
+  //           </FormItem>
+  //         </Col>
+  //         <Col md={8} sm={24}>
+  //           <span className={styles.submitButtons}>
+  //             <Button type="primary" htmlType="submit">
+  //               查询
+  //             </Button>
+  //             <Button
+  //               style={{
+  //                 marginLeft: 8,
+  //               }}
+  //               onClick={this.handleFormReset}
+  //             >
+  //               重置
+  //             </Button>
+  //             <a
+  //               style={{
+  //                 marginLeft: 8,
+  //               }}
+  //               onClick={this.toggleForm}
+  //             >
+  //               展开 <Icon type="down" />
+  //             </a>
+  //           </span>
+  //         </Col>
+  //       </Row>
+  //     </Form>
+  //   );
+  // }
+
   renderSimpleForm() {
-    const { form } = this.props;
-    const { getFieldDecorator } = form;
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
+    const vendorlist = BuildvendorArray(this.state.res).map(item => {
+      return (
+        <Option value={item} key={item}>
+          {item}
+        </Option>
+      );
+    });
+    const typelist = BuildtypeArray(this.state.res).map(item => {
+      return (
+        <Option value={item} key={item}>
+          {item}
+        </Option>
+      );
+    });
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row
-          gutter={{
-            md: 8,
-            lg: 24,
-            xl: 48,
-          }}
-        >
-          <Col md={8} sm={24}>
-            <FormItem label="规则名称">
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <Col md={8} sm={10}>
+            <Form.Item label="商品名称">
               {getFieldDecorator('name')(<Input placeholder="请输入" />)}
-            </FormItem>
+            </Form.Item>
           </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
-                <Select
-                  placeholder="请选择"
-                  style={{
-                    width: '100%',
-                  }}
-                >
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>,
+          <Col md={8} sm={10}>
+            <Form.Item label="商品类型">
+              {getFieldDecorator('type')(
+                <Select placeholder="请选择" style={{ width: '120px' }}>
+                  {typelist}
+                </Select>
               )}
-            </FormItem>
+            </Form.Item>
           </Col>
-          <Col md={8} sm={24}>
+          <Col md={8} sm={10}>
+            <Form.Item label="供应商">
+              {getFieldDecorator('vendor')(
+                <Select placeholder="请选择" style={{ width: '120px' }}>
+                  {vendorlist}
+                </Select>
+              )}
+            </Form.Item>
+          </Col>
+          <Col md={4} sm={8}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
               </Button>
-              <Button
-                style={{
-                  marginLeft: 8,
-                }}
-                onClick={this.handleFormReset}
-              >
+              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              {/* <a
-                style={{
-                  marginLeft: 8,
-                }}
-                onClick={this.toggleForm}
-              >
-                展开 <Icon type="down" />
-              </a> */}
             </span>
           </Col>
         </Row>
@@ -481,6 +585,8 @@ class Product extends Component {
       </Form>
     );
   }
+
+
 
   renderForm() {
     const { expandForm } = this.state;

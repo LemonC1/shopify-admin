@@ -19,6 +19,10 @@ const Model = {
           pagination: {},
         },
       });
+      yield put({
+        type: 'item',
+        payload: 0,
+      });
     },
 
     *add({ payload, callback }, { call, put }) {
@@ -53,6 +57,9 @@ const Model = {
   reducers: {
     save(state, action) {
       return { ...state, data: action.payload };
+    },
+    item(state, action) {
+      return { ...state, item: action.payload };
     },
   },
 };

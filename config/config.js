@@ -209,17 +209,22 @@ export default {
               icon: 'form',
               name: 'products',
               routes: [
-                // {
-                //   name: 'all',
-                //   icon: 'table',
-                //   path: '/products/all',
-                //   component: './products/all',
-                // },
+               
                 {
                   name: 'all-products',
                   icon: 'table',
                   path: '/products/all-products',
                   component: './products/all-products',
+                },
+                // {
+                //   path: '/products/all-products/detail',
+                //   component: './products/all-products/detail',
+                // },
+                {
+                  name: 'add-products',
+                  icon: 'table',
+                  path: '/products/add-products',
+                  component: './products/add-products',
                 },
                 {
                   name: 'classify',
