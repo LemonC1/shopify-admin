@@ -79,6 +79,8 @@ class StandardTable extends Component {
     const { list = [], pagination = false } = data || {};
     const paginationProps = pagination
       ? {
+          defaultPageSize: '5',
+          pageSizeOptions: ['1', '2', '5'],
           showSizeChanger: true,
           showQuickJumper: true,
           ...pagination,

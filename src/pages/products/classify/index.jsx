@@ -53,8 +53,21 @@ class classify extends Component {
 
   columns = [
     {
+      title: ' ',
+      dataIndex: 'image.src',
+      width: '5%',
+      render: (_, record) => {
+        const srcs =
+          record.image == null
+            ? 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1576564146465&di=0eea2d0226ac52395002f6aaf264008c&imgtype=0&src=http%3A%2F%2Fe.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fb90e7bec54e736d13303db2498504fc2d562698d.jpg'
+            : record.image.src;
+        return <img src={srcs} style={{ width: '50px' }} />;
+      },
+    },
+    {
       title: '标题',
       dataIndex: 'title',
+      render: val => <a>{val}</a>,
     },
     {
       title: '产品规则',
@@ -326,14 +339,14 @@ class classify extends Component {
               >
                 重置
               </Button>
-              {/* <a
+              <a
                 style={{
                   marginLeft: 8,
                 }}
                 onClick={this.toggleForm}
               >
                 展开 <Icon type="down" />
-              </a> */}
+              </a>
             </span>
           </Col>
         </Row>
